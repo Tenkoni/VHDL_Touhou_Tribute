@@ -1,0 +1,55 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity sync is
+port(
+	clk: in std_logic;
+	hsync, vsync: out std_logic;
+	r, g, b : out std_logic_vector(3 downto 0)
+);
+end sync;
+
+architecture main of sync is 
+signal hpos: integer range 0 to 800 := 0;
+signal vpos: integer range 0 to 525 := 0;
+
+begin 
+
+process (clk) --esto controla el pixel que se está actualizando
+begin 
+	if rising_edge(clk) then
+		if (hpos < 800) then --total de pixeles horizontales fp+sync+bp+av (16+96+48+640 = 800)
+			hpos <= hpos + 1;
+		else 
+			hpos <= 0;
+			if(vpos<525) then --igual que arriba pero para la vertical (10+2+33+480 = 525)
+				vpos <= vpos + 1;
+			else
+				vpos <= 0;
+			end if;
+		end if;
+		
+		if (hpos > 16 and hpos < 112) then --señal de sincronizacion horizontal, fp, fp+sync
+			hsync <= '0'; --esto es porque el pulso de sync es bajo
+		else
+			hsync <= '1';
+		end if;	
+		
+		if (hpos > 10 and hpos < 12) then --señal de sincronizacion vertical, fp, fp+sync
+			vsync <= '0'; --esto es porque el pulso de sync es bajo
+		else
+			vsync <= '1';
+		end if;	
+		
+		
+		if ((hpos > 0 and hpos < 160) or (vpos > 0 and vpos < 45)) then --cuando se esté en fp, sync y bp se deben mantener las  señales de los colores en 0
+			r <= (others => '0');
+			g <= (others => '0');
+			b <= (others => '0');
+		end if;
+		
+	end if;
+end process;
+end main;

@@ -1,0 +1,119 @@
+-- ****************************************************
+--                    Proyecto Final   
+-- ****************************************************
+-- Integrantes:
+--   Garrido Lopez Luis Enrique
+--   Miramonte Sarabia Luis Enrique
+--   Ortiz Figueroa Maria Fernanda
+-- ****************************************************
+
+-- ****************************************************
+--        Modulo para dibujar al los personajes
+-- ****************************************************
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity bullet_tracking is
+	port(
+		-- Reloj de 25.175 MHz
+		clk: in std_logic;
+		signal xcur, ycur, xpos_player, ypos_player: in integer;
+		signal rgb: out std_logic_vector(11 downto 0);
+		signal draw: out std_logic;
+		signal button: in std_logic;
+		signal bullet_signal: in std_logic
+	);
+end bullet_tracking;
+
+architecture main of bullet_tracking is
+	
+	signal b1_x, b2_x, b3_x, b4_x, b5_x, b6_x: integer range 0 to 800 := 0;
+	signal b1_y, b2_y, b3_y, b4_y, b5_y, b6_y: integer range 0 to 525 := 0;
+	
+	
+	type rom_sprite is array (0 to 240) of std_logic_vector(11 downto 0);
+	constant star_bullet : rom_sprite := (x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"CCA",x"CCA",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"BB9",x"322",x"774",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"BB8",x"320",x"650",x"773",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"885",x"542",x"452",x"996",x"BB8",x"320",x"770",x"EE6",x"FF2",x"551",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"996",x"320",x"981",x"991",x"991",x"FE3",x"FEC",x"FFE",x"FE8",x"650",x"CDB",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"551",x"EC1",x"FFD",x"FFE",x"FFE",x"FFE",x"FFF",x"FFD",x"AA0",x"873",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"885",x"871",x"FFB",x"FFF",x"FFE",x"FFE",x"FFF",x"FFF",x"FE9",x"871",x"551",x"AA7",x"0F0",x"0F0",x"0F0",x"0F0",x"440",x"FE9",x"FFF",x"FFF",x"FFF",x"FFF",x"FFF",x"FFF",x"FFB",x"EE1",x"330",x"542",x"BB9",x"0F0",x"0F0",x"440",x"FFB",x"FFF",x"FFF",x"FFF",x"FFF",x"FFF",x"EED",x"FE8",x"EC1",x"330",x"431",x"BB8",x"0F0",x"996",x"871",x"FFD",x"FFF",x"FFF",x"FFF",x"FFF",x"FFE",x"FE4",x"981",x"551",x"A97",x"0F0",x"0F0",x"0F0",x"441",x"ED2",x"FFE",x"FFE",x"FFF",x"FFE",x"FFE",x"FFB",x"871",x"774",x"0F0",x"0F0",x"0F0",x"0F0",x"996",x"320",x"761",x"991",x"871",x"AA0",x"FE4",x"FFB",x"EE6",x"661",x"CDB",x"0F0",x"0F0",x"0F0",x"0F0",x"996",x"542",x"774",x"885",x"AA7",x"995",x"440",x"EC1",x"ED2",x"551",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"BB8",x"440",x"560",x"221",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"BB8",x"322",x"774",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0",x"BB9",x"CCA",x"0F0",x"0F0",x"0F0",x"0F0",x"0F0")
+	
+begin
+
+	process (clk):
+	begin
+		if rising_edge(clk) then
+			if (button_press = '1') then
+				if(b1_x = 0) then
+					b1_x <= xpos_player + 5;
+					b1_y <= ypos_player - 5;
+				elsif(b2_x = 0) then
+					b2_x <= xpos_player + 5;
+					b2_y <= ypos_player - 5;
+				elsif(b3_x = 0) then
+					b3_x <= xpos_player + 5;
+					b3_y <= ypos_player - 5;
+				elsif(b4_x = 0) then
+					b4_x <= xpos_player + 5;
+					b4_y <= ypos_player - 5;
+				elsif(b5_x = 0) then
+					b5_x <= xpos_player + 5;
+					b5_y <= ypos_player - 5;
+				elsif(b6_x = 0) then
+					b6_x <= xpos_player + 5;
+					b6_y <= ypos_player - 5;
+				end if;
+			end if;
+			if (bullet_signal = '1') then
+				if(b1_x /= 0):
+					if( (b1_y - 10) < 45) then
+						b1_x <= 0;
+						b1_y <= 0;
+					else
+						b1_y <= b1_y - 10;
+					end if;
+				elsif(b2_x /= 0) then
+					if( (b2_y - 10) < 45) then
+						b2_x <= 0;
+						b2_y <= 0;
+					else
+						b2_y <= b2_y - 10;
+					end if;
+				elsif(b3_x /= 0) then
+					if( (b3_y - 10) < 45) then
+						b3_x <= 0;
+						b3_y <= 0;
+					else
+						b3_y <= b3_y - 10;
+					end if;
+				elsif(b4_x /= 0) then
+					if( (b4_y - 10) < 45) then
+						b4_x <= 0;
+						b4_y <= 0;
+					else
+						b4_y <= b4_y - 10;
+					end if;
+				elsif(b5_x /= 0) then
+					if( (b5_y - 10) < 45) then
+						b5_x <= 0;
+						b5_y <= 0;
+					else
+						b5_y <= b5_y - 10;
+					end if;
+				elsif(b6_x /= 0) then
+					if( (b6_y - 10) < 45) then
+						b6_x <= 0;
+						b6_y <= 0;
+					else
+						b6_y <= b6_y - 10;
+					end if;
+				end if;
+			end if;
+			
+			if(xcur>xpos and xcur<=xpos+25 and ycur>ypos and ycur<=ypos+47) then 
+				draw <= '1';
+			
+				
+			
+				
+			
+			
